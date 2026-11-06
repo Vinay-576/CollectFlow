@@ -62,7 +62,7 @@ app = FastAPI(
 allowed_origins = [
     origin.strip()
     for origin in os.getenv(
-        "FRONTEND_ORIGINS", "http://127.0.0.1:5173,http://localhost:5173"
+        "FRONTEND_ORIGINS", "http://127.0.0.1:5173,http://localhost:5173,http://127.0.0.1:5174,http://localhost:5174"
     ).split(",")
     if origin.strip()
 ]
@@ -137,6 +137,8 @@ def route_for_user(user: dict) -> str:
         active_membership = db.memberships.find_one(
             {"userId": user_id, "status": "active"}
         )
+        if not active_membership and user.get("organizationId"):
+            return CREDITOR_DASHBOARD_PATH
         if not active_membership:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -148,6 +150,8 @@ def route_for_user(user: dict) -> str:
         active_membership = db.memberships.find_one(
             {"userId": user_id, "status": "active"}
         )
+        if not active_membership and user.get("organizationId"):
+            return AGENCY_DASHBOARD_PATH
         if not active_membership:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,

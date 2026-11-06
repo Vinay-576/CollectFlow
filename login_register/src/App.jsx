@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
+const DASHBOARD_BASE_URL = import.meta.env.VITE_DASHBOARD_BASE_URL || 'http://127.0.0.1:5174';
 
 const accountTypes = [
   {
@@ -422,7 +423,10 @@ function AuthPanel({ preference, setPreference }) {
       }
 
       setNotice(data.message || 'Signed in successfully. Opening your workspace…');
-      if (data.redirect_path) window.location.assign(data.redirect_path);
+      if (data.redirect_path) {
+        const dashboardUrl = new URL(data.redirect_path, DASHBOARD_BASE_URL);
+        window.location.assign(dashboardUrl.href);
+      }
     } catch (error) {
       setNotice(error instanceof Error ? error.message : 'Could not connect to CollectFlow. Check that the API is running.');
     } finally {

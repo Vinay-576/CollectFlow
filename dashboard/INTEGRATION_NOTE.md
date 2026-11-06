@@ -1,11 +1,7 @@
-# Dashboard route integration
+# Dashboard routes
 
-The authentication API currently sends users to these frontend paths by default:
+- `/dashboard/creditor` — creditor overview styled from the supplied `App.jsx`.
+- `/dashboard/agency` — agency portfolios and collector workload.
+- `/dashboard/pulse` — Daily Pulse for the signed-in creditor or agency.
 
-- `/dashboard/creditor`
-- `/dashboard/agency`
-- `/dashboard/debtor`
-
-Connect these paths to your existing Dashboard application, or change the three `*_DASHBOARD_PATH` values in `login_register/backend/.env` to match your routes.
-
-Keep all data access protected by FastAPI membership and tenant checks. Frontend routing alone does not secure dashboard data.
+The app checks the authenticated user through `/api/auth/me`. The existing API returns creditor and agency routes. Live invoice, case, payment and task data queries are not included; build those endpoints with tenant and mandate checks before replacing the marked sample preview data.

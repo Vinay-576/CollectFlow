@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Search,
   Bell,
@@ -1887,7 +1887,69 @@ const CollectFlowBoard = ({ theme = 'light', onToggleTheme }) => {
 // ==========================================
 
 export default function App() {
-  const [theme, setTheme] = useState('light');
+  const [preference, setPreference] = useState(() => {
+    try {
+      return localStorage.getItem('collectflow-dashboard-theme') || 'light';
+    } catch {
+      return 'light';
+    }
+  });
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+
+    const verifySession = async () => {
+      try {
+        const response = await fetch('/api/auth/me', {
+          method: 'GET',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.user || data.user.account_type !== 'creditor') {
+          if (active) {
+            window.location.assign('http://127.0.0.1:5173');
+          }
+          return;
+        }
+
+        if (active) {
+          setIsAuthorized(true);
+        }
+      } catch (error) {
+        if (active) {
+          window.location.assign('http://127.0.0.1:5173');
+        }
+      } finally {
+        if (active) {
+          setIsChecking(false);
+        }
+      }
+    };
+
+    verifySession();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (isChecking) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-[#f5f5fb] text-slate-700">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-violet-200 border-t-violet-600" />
+          <p className="text-sm font-semibold tracking-[0.14em] text-slate-500 uppercase">Loading dashboard</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthorized) {
+    return null;
+  }
 
   return (
     <div
