@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 CollectFlow
 =======
 # CollectFlow authentication + MongoDB integration
